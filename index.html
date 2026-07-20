@@ -1,0 +1,385 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Anh Sùng - Ultimate Hub</title>
+    <!-- Nhúng Font & Icon thế hệ mới -->
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;600&family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Poppins', sans-serif;
+            user-select: none; /* Chống copy text bừa bãi */
+        }
+
+        body {
+            background: linear-gradient(135deg, #0f0c1b, #24243e, #300030);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+            overflow-x: hidden;
+            overflow-y: auto; /* Cho phép cuộn trang nếu màn hình ngắn */
+            position: relative;
+        }
+
+        /* Khung chứa hiệu ứng hạt bay nền */
+        #particles-container {
+            position: absolute;
+            top: 0; left: 0; width: 100%; height: 100%;
+            z-index: 1; pointer-events: none;
+        }
+        .particle {
+            position: absolute;
+            background: rgba(255, 255, 255, 0.4);
+            border-radius: 50%;
+            pointer-events: none;
+            animation: floatUp linear infinite;
+        }
+        @keyframes floatUp {
+            0% { transform: translateY(100vh) scale(0); opacity: 0; }
+            10% { opacity: 1; }
+            90% { opacity: 1; }
+            100% { transform: translateY(-10vh) scale(1); opacity: 0; }
+        }
+
+        /* Hiệu ứng sóng click chuột */
+        .click-ripple {
+            position: absolute;
+            border: 2px solid #00f2fe;
+            border-radius: 50%;
+            background: rgba(0, 242, 254, 0.1);
+            pointer-events: none;
+            transform: translate(-50%, -50%);
+            animation: rippleEffect 0.6s ease-out forwards;
+            z-index: 9999;
+        }
+        @keyframes rippleEffect {
+            0% { width: 0; height: 0; opacity: 1; }
+            100% { width: 50px; height: 50px; opacity: 0; }
+        }
+
+        /* Khung kính mờ nâng cấp chống lóa */
+        .glass-card {
+            background: rgba(255, 255, 255, 0.03);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border-radius: 24px;
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            box-shadow: 0 20px 50px rgba(0, 0, 0, 0.6);
+            padding: 35px 20px 25px;
+            width: 100%;
+            max-width: 400px;
+            text-align: center;
+            position: relative;
+            z-index: 2;
+            transition: all 0.5s ease;
+            margin: auto;
+        }
+        
+        .glass-card.clean-mode {
+            background: rgba(0, 0, 0, 0.6);
+            backdrop-filter: blur(0px);
+            -webkit-backdrop-filter: blur(0px);
+            border-color: rgba(255, 255, 255, 0.2);
+        }
+
+        /* KHU VỰC ĐIỀU CHỈNH MENU NHỎ GỌN - TỰ CUỘN */
+        .menu-wrapper {
+            position: absolute;
+            top: 15px; left: 15px;
+            z-index: 10;
+            text-align: left;
+        }
+        .menu-tag {
+            color: rgba(255,255,255,0.4); cursor: pointer; transition: 0.3s;
+            font-size: 16px;
+            display: inline-block;
+        }
+        .menu-tag:hover { color: #00f2fe; }
+
+        .menu-dropdown {
+            position: absolute;
+            top: 30px; left: 0;
+            background: rgba(15, 12, 27, 0.95);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            border-radius: 12px;
+            width: 170px;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.5);
+            
+            /* Tự cuộn thông minh */
+            max-height: 0px; 
+            overflow-y: auto; 
+            opacity: 0;
+            pointer-events: none;
+            transition: max-height 0.3s ease, opacity 0.3s ease;
+            padding: 0;
+        }
+        .menu-dropdown.open {
+            max-height: 200px; /* Vượt quá chiều cao này menu sẽ tự cuộn bên trong */
+            opacity: 1;
+            pointer-events: auto;
+            padding: 6px 0;
+        }
+
+        /* Tùy chỉnh thanh cuộn menu tinh tế */
+        .menu-dropdown::-webkit-scrollbar { width: 4px; }
+        .menu-dropdown::-webkit-scrollbar-thumb { background: rgba(0, 242, 254, 0.4); border-radius: 4px; }
+
+        .menu-item {
+            display: block;
+            padding: 10px 15px;
+            font-size: 12px;
+            color: rgba(255,255,255,0.8);
+            text-decoration: none;
+            transition: 0.2s;
+            cursor: pointer;
+            border-bottom: 1px solid rgba(255,255,255,0.03);
+        }
+        .menu-item:last-child { border-bottom: none; }
+        .menu-item:hover {
+            background: rgba(200, 200, 200, 0.05);
+            color: #00f2fe;
+            padding-left: 18px; /* Hiệu ứng đẩy nhẹ sang phải khi hover */
+        }
+
+        /* Avatar chuyển động phát sáng */
+        .avatar-container {
+            position: relative;
+            width: 90px;
+            height: 90px;
+            margin: 0 auto 15px;
+        }
+        .avatar {
+            width: 100%; height: 100%; border-radius: 50%;
+            background: linear-gradient(45deg, #ff007f, #7f00ff);
+            display: flex; justify-content: center; align-items: center;
+            color: white; font-size: 32px; font-weight: 600;
+            border: 3px solid rgba(255,255,255,0.1);
+            font-family: 'Orbitron', sans-serif;
+            text-shadow: 0 0 10px rgba(255,255,255,0.5);
+        }
+
+        h1 {
+            font-family: 'Orbitron', sans-serif;
+            font-size: 22px; color: #ffffff;
+            margin-bottom: 20px; letter-spacing: 2px;
+        }
+
+        .button-list { display: flex; flex-direction: column; gap: 12px; }
+
+        /* Nút đa năng tối ưu cho điện thoại */
+        .btn {
+            display: flex; align-items: center; justify-content: space-between;
+            padding: 14px 18px; border-radius: 14px;
+            text-decoration: none; font-size: 13px; color: #ffffff;
+            background: rgba(255, 255, 255, 0.02);
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+            cursor: pointer;
+        }
+        .btn-left { display: flex; align-items: center; text-align: left; }
+        .btn i { margin-right: 12px; font-size: 16px; width: 20px; text-align: center; }
+        .arrow-icon { font-size: 11px; opacity: 0.3; transition: 0.3s; }
+        
+        .btn:hover {
+            background: rgba(255, 255, 255, 0.08);
+            transform: scale(1.02);
+        }
+        .btn:hover .arrow-icon { opacity: 1; transform: translateX(3px); }
+
+        /* Hiệu ứng màu Hover từng nền tảng */
+        .btn-discord:hover { border-color: #5865F2; box-shadow: 0 0 15px rgba(88, 101, 242, 0.4); color: #5865F2;}
+        .btn-tiktok:hover { border-color: #00f2fe; box-shadow: 0 0 15px rgba(0, 242, 254, 0.4); color: #00f2fe;}
+        .btn-facebook:hover { border-color: #1877f2; box-shadow: 0 0 15px rgba(24, 119, 242, 0.4); color: #1877f2;}
+        .btn-youtube:hover { border-color: #ff0000; box-shadow: 0 0 15px rgba(255, 0, 0, 0.4); color: #ff0000;}
+        .btn-email:hover { border-color: #ffaa00; box-shadow: 0 0 15px rgba(255, 170, 0, 0.4); color: #ffaa00;}
+        
+        /* Nút Copy dữ liệu STK */
+        .btn-copy { border-color: rgba(0, 242, 254, 0.3); background: rgba(0, 242, 254, 0.04); }
+        .btn-copy:hover { border-color: #00f2fe; box-shadow: 0 0 15px rgba(0, 242, 254, 0.4); }
+
+        /* Toast thông báo */
+        .toast {
+            position: fixed; bottom: -50px; left: 50%; transform: translateX(-50%);
+            background: #00f2fe; color: #000; padding: 10px 25px;
+            border-radius: 30px; font-weight: 600; font-size: 13px;
+            box-shadow: 0 5px 15px rgba(0,242,254,0.4);
+            z-index: 99999; transition: 0.4s ease; opacity: 0;
+            width: max-content; max-width: 90%; text-align: center;
+        }
+        .toast.show { bottom: 30px; opacity: 1; }
+
+        /* Vùng chứa các nút điều khiển góc trên bên phải */
+        .control-tags {
+            position: absolute; top: 15px; right: 15px;
+            display: flex; gap: 12px; font-size: 15px;
+            z-index: 10;
+        }
+        .icon-tag {
+            color: rgba(255,255,255,0.4); cursor: pointer; transition: 0.3s;
+        }
+        .icon-tag:hover { color: #00f2fe; }
+
+        footer { margin-top: 25px; font-size: 10px; color: rgba(255, 255, 255, 0.3); letter-spacing: 1px; }
+    </style>
+</head>
+<body>
+
+    <!-- Khung tạo hạt bay tự động -->
+    <div id="particles-container"></div>
+
+    <div class="glass-card" id="mainCard">
+        
+        <!-- CẤU TRÚC MENU THẢ XUỐNG -->
+        <div class="menu-wrapper">
+            <div class="menu-tag" onclick="toggleMenu(event)" title="Mở Menu"><i class="fas fa-bars"></i></div>
+            <div class="menu-dropdown" id="menuDropdown">
+                <a class="menu-item" onclick="closeMenu()">Trang chủ</a>
+                <!-- CÁC ĐƯỜNG LINK CỦA BẠN ĐÃ ĐƯỢC CẬP NHẬT TẠI ĐÂY -->
+                <a class="menu-item" href="https://yeu.ilove.gt.tc/" target="_blank">Yêu I Love</a>
+                <a class="menu-item" href="https://cd.chidoi.gt.tc/" target="_blank">Chi Đội</a>
+                <a class="menu-item" onclick="handleMenuDonate()">Donate STK</a>
+            </div>
+        </div>
+
+        <!-- Khu vực nút tính năng phụ góc trên bên phải -->
+        <div class="control-tags">
+            <div class="icon-tag" onclick="toggleCleanMode()" title="Bật/Tắt chế độ tối giản"><i class="fas fa-eye-slash"></i></div>
+            <div class="icon-tag" onclick="sharePage()" title="Sao chép link trang này"><i class="fas fa-share-alt"></i></div>
+        </div>
+
+        <!-- Ảnh đại diện / Avatar viết tắt -->
+        <div class="avatar-container">
+            <div class="avatar">AS</div>
+        </div>
+        
+        <h1>ANH SÙNG</h1>
+
+        <!-- Danh sách các nút liên kết công việc/mạng xã hội -->
+        <div class="button-list">
+            <a href="#" target="_blank" class="btn btn-discord">
+                <span class="btn-left"><i class="fab fa-discord"></i> Discord</span>
+                <i class="fas fa-chevron-right arrow-icon"></i>
+            </a>
+            <a href="#" target="_blank" class="btn btn-tiktok">
+                <span class="btn-left"><i class="fab fa-tiktok"></i> Kênh TikTok</span>
+                <i class="fas fa-chevron-right arrow-icon"></i>
+            </a>
+            <a href="#" target="_blank" class="btn btn-facebook">
+                <span class="btn-left"><i class="fab fa-facebook-f"></i> Facebook Cá Nhân</span>
+                <i class="fas fa-chevron-right arrow-icon"></i>
+            </a>
+            <a href="#" target="_blank" class="btn btn-youtube">
+                <span class="btn-left"><i class="fab fa-youtube"></i> Kênh YouTube</span>
+                <i class="fas fa-chevron-right arrow-icon"></i>
+            </a>
+            <a href="https://mail.google.com/mail/?view=cm&fs=1&to=anhsung986@gmail.com" target="_blank" class="btn btn-email">
+                <span class="btn-left"><i class="fas fa-envelope"></i> Gửi Mail Trực Tiếp</span>
+                <i class="fas fa-chevron-right arrow-icon"></i>
+            </a>
+
+            <!-- NÚT CHỈ HIỂN THỊ CHỮ, BẤM VÀO SẼ TỰ ĐỘNG COPY STK ẨN -->
+            <div class="btn btn-copy" id="donateBtn" onclick="copySTK('0123456789 - MB Bank')">
+                <span class="btn-left" style="color: #00f2fe;">
+                    <i class="fas fa-wallet"></i> Số tài khoản
+                </span>
+                <i class="far fa-copy" style="font-size:13px; opacity:0.6;"></i>
+            </div>
+        </div>
+
+        <footer>POWERED BY ANH SÙNG • © 2026</footer>
+    </div>
+
+    <!-- Hộp thông báo pop-up -->
+    <div class="toast" id="toastMessage">Đã copy thành công!</div>
+
+    <script>
+        // Tạo hiệu ứng các hạt bay ngẫu nhiên ở nền web
+        const pContainer = document.getElementById('particles-container');
+        function createParticle() {
+            const particle = document.createElement('div');
+            particle.classList.add('particle');
+            
+            const size = Math.random() * 4 + 2; 
+            particle.style.width = `${size}px`;
+            particle.style.height = `${size}px`;
+            
+            particle.style.left = `${Math.random() * 100}vw`; 
+            particle.style.animationDuration = `${Math.random() * 6 + 4}s`; 
+            
+            pContainer.appendChild(particle);
+            setTimeout(() => { particle.remove(); }, 10000); 
+        }
+        setInterval(createParticle, 250); 
+
+        // Tạo hiệu ứng sóng năng lượng khi Click chuột vào màn hình
+        window.addEventListener('click', (e) => {
+            if (e.target.closest('.menu-wrapper') || e.target.closest('.control-tags')) return;
+            
+            const ripple = document.createElement('div');
+            ripple.classList.add('click-ripple');
+            ripple.style.left = `${e.clientX}px`;
+            ripple.style.top = `${e.clientY}px`;
+            document.body.appendChild(ripple);
+            setTimeout(() => { ripple.remove(); }, 600);
+        });
+
+        // Hàm Bật/Tắt Menu thả xuống nhỏ gọn
+        function toggleMenu(event) {
+            event.stopPropagation(); 
+            const dropdown = document.getElementById('menuDropdown');
+            dropdown.classList.toggle('open');
+        }
+
+        function closeMenu() {
+            document.getElementById('menuDropdown').classList.remove('open');
+        }
+
+        // Tự đóng menu khi nhấn bất kỳ đâu bên ngoài vùng menu
+        document.addEventListener('click', () => { closeMenu(); });
+
+        // Xử lý khi click vào mục Donate trong Menu
+        function handleMenuDonate() {
+            closeMenu();
+            setTimeout(() => {
+                copySTK('0123456789 - MB Bank'); 
+            }, 300);
+        }
+
+        // Chuyển đổi qua lại chế độ Tối giản (Clear) và Kính mờ (Blur)
+        function toggleCleanMode() {
+            const card = document.getElementById('mainCard');
+            card.classList.toggle('clean-mode');
+            showToast(card.classList.contains('clean-mode') ? "👁️ Đã bật Chế độ tối giản!" : "🔮 Đã bật Chế độ kính mờ!");
+        }
+
+        // Sao chép STK ngân hàng nhanh kèm thông báo
+        function copySTK(textToCopy) {
+            navigator.clipboard.writeText(textToCopy);
+            showToast("📋 Đã copy Số Tài Khoản!");
+        }
+
+        // Sao chép đường link trang web hiện tại để share cho bạn bè
+        function sharePage() {
+            navigator.clipboard.writeText(window.location.href);
+            showToast("🔗 Đã copy link trang cá nhân!");
+        }
+
+        // Hàm kích hoạt hiệu ứng thông báo Toast
+        function showToast(msg) {
+            const toast = document.getElementById("toastMessage");
+            toast.innerText = msg;
+            toast.classList.add("show");
+            setTimeout(() => { toast.classList.remove("show"); }, 2500);
+        }
+    </script>
+</body>
+</html>
